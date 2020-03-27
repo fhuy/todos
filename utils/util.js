@@ -1,65 +1,16 @@
+// class ErrorModel{
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const formatTime = date => {
-//   const year = date.getFullYear()
-//   const month = date.getMonth() + 1
-//   const day = date.getDate()
-//   const hour = date.getHours()
-//   const minute = date.getMinutes()
-//   const second = date.getSeconds()
-
-//   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+// }
+// function errorModel(statusCode, text){
+//   if(statusCode === 200){
+//     return 
+//   }else{
+//     return `${text}失败`
+//   }
 // }
 
-// const formatNumber = n => {
-//   n = n.toString()
-//   return n[1] ? n : '0' + n
-// }
-
-// module.exports = {
-//   formatTime: formatTime
+// function errorModel(statusCode, message, data){
+//   if(statusCode===200){
+//     return `${message}成功`
+//   }else if()
 // }

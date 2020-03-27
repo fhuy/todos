@@ -11,24 +11,17 @@ Page({
     tags: []
   },
   onLoad: function () {
-    // this.setData({
-    //   todos: wx.getStorageSync('todo_list') || [],
-    //   todoCounts: wx.getStorageSync('todoCounts') || 0
-    // })
-    API.login()
-    API.getList()
-          .then(res=>{
-            if (res.statusCode === 200){
-              this.setData({
-                todos: res.data.list
-              })
-            } else {
-              console.log('获取数据失败', res.errMsg)
-            }
-          })
-          .catch(err=>{
-            console.log(err)
-          })
+    API.login().then(res=>{
+      console.log('look',res)
+      // if (res.statusCode === 200){
+        this.setData({
+          todos: res.data.list
+          // todos: res
+        })
+      // } else {
+      //   console.log('获取数据失败', res.errMsg)
+      // }
+    })
   },
   toAdd: function (res) {
     if(this.data.todos.length===10){

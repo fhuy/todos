@@ -1,57 +1,52 @@
+const app = getApp()
 const base_url = 'https://mp.lihs.me',
-      log_url ='/login',
-      get_url = '/getTodoList',
-      add_url = '/addTodo',
-      del_url = '/delTodo',
-      mod_url = '/modTodo',
       post = 'POST';
 
-const login = () => {
-  const promise = new Promise((resolve, reject) => {
+const login = () => {  
+  const userid = new Promise((resolve, reject) => {
+    const log_url = `${base_url}/login`
     wx.login({
       success(res) {
-        if (res.code) {
-          requestP(
-            post, 
-            log_url, 
-            { code: res.code }
-          ).then(res => {
-            if (res.statusCode === 200) {
-              wx.setStorageSync('userInfo', res.data)
-            } else {
-              console.log('登录失败', res.errMsg)
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        } else {
-          reject(res)
+          if (res.code) {
+            resolve(requestPP(
+              post,
+              log_url,
+              { code: res.code }
+            ))
+          } else {
+            reject(res)
+          }
         }
-      }
     })
   })
-  return promise
+  return userid.then(res => {
+    if (res.statusCode === 200){
+      app.globalData.userID = {
+        uid: res.data.uid,
+        token: res.data.token
+      }      
+      return getList()
+    }
+    return res.errMsg
+  })
 }
 
 const getList = () => {
-  if (!wx.getStorageSync('userInfo')){
-      login()
-  }
+  const get_url = `${base_url}/getTodoList`  
   return requestP(
     post,
-    get_url,
-    wx.getStorageSync('userInfo')
+    get_url
   )
 }
 
-const addApi = (params)=>{
+const addApi = (todoText)=>{
   if (!wx.getStorageSync('userInfo')) {
     login()
   }  
-  const userInfo = Object.assign(
-    wx.getStorageSync('userInfo'),        //{ uid: , token: }
-    { todoText: params }
-  )
+  const add_url = `${base_url}/addTodo`
+  const userInfo = { 
+    todoText 
+  }
   return requestP(
     post,
     add_url,
@@ -63,12 +58,10 @@ const delApi = (id) => {
   if (!wx.getStorageSync('userInfo')) {
     login()
   }  
-  const userInfo = Object.assign(
-    wx.getStorageSync('userInfo'),        //{ uid: , token: }
-    {
+  const del_url = `${base_url}/delTodo`
+  const userInfo = {
       todoId: id
     }
-  )
   return requestP(
     post,
     del_url,
@@ -87,14 +80,12 @@ const delMoreApi = (arr) => {
 }
 
 const modApi = (params) => {
-  const userInfo = Object.assign(
-    wx.getStorageSync('userInfo'),        //{ uid: , token: }
-    { 
+  const mod_url = `${base_url}/modTodo`
+  const userInfo = { 
       todoText: params.new_value, 
       todoIsDone: true,
       todoID: params.id
     }
-  )
   return requestP(
     post,
     mod_url,
@@ -102,16 +93,67 @@ const modApi = (params) => {
   )
 }
 
-const requestP = (method, url, userInfo) => {
+const requestPP = (method, url, userInfo) => {
+  const userID = app.globalData.userID
+  console.log('id', userID)
   return new Promise((resolve, reject) => {
     wx.request({
       method,
-      url: base_url + url,
+      url,
       data: userInfo,
       headers: {
         'Content-Type': 'application/json' // 默认值
       },
       success: res => resolve(res),
+      fail: res => reject(res)
+    })
+  })
+}
+
+
+function responseModel(res) {
+  if (res.statusCode === 200) {
+    return new Promise((resolve, reject)=>{
+      resolve(res)
+      })
+  }else if(res.statusCode===400){
+      console.log('错误请求')
+  }
+}
+
+const getUserId=()=>{
+  let userID={
+    uid: '',
+    token: ''
+  }
+  if(!userID){
+    console.log('xx')
+  }else{
+    console.log(1)
+  }
+  // if (!app.globalData.userID)
+}
+
+const requestP = (method, url, userInfo={}) => {
+  getUserId()
+  const uid = app.globalData.userID.uid,
+    token = app.globalData.userID.token
+
+  return new Promise((resolve, reject) => {
+    wx.request({
+      method,
+      url,
+      // data: userInfo,    
+      data: Object.assign({
+        uid,
+        token
+      },userInfo),          
+      headers: {
+        'Content-Type': 'application/json' // 默认值
+      },
+      // success: res => resolve(res),
+      // success: res => resolve(responseModel(res)),
+      success: res => { return responseModel(res)},
       fail: res => reject(res)
     })
   })
@@ -126,13 +168,3 @@ module.exports={
   modApi  
 }
 
-
-// 没有uid和token，就登录
-// const getToken=()=>{
-//   return new Promise((res, rej) => {
-//     if (!wx.getStorageSync('userInfo'){
-//       login()
-
-//     }
-//   })
-// }
