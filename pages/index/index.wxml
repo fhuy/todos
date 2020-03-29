@@ -2,11 +2,12 @@
 <view class="container">
   <view class="head">
     <input   
-          class="new-todo" 
-          value="{{input}}" 
-          placeholder="Anything here..." 
-          focus  
-          bindblur="toAdd" />
+        class="new-todo" 
+        value="{{input}}" 
+        placeholder="Anything here..." 
+        focus  
+        bindblur="toAdd" 
+    />
     <button class="add">+ Add</button>
   </view>
   <view class="section">
@@ -20,26 +21,30 @@
             wx:for="{{todos}}" 
             wx:key="id" 
             data-index="{{todo.id}}"  
-            wx:for-item="todo">
+            wx:for-item="todo"
+      >
         <checkbox 
-                value="{{todo.id}}" 
-                checked="{{todo.checked}}" />
+            value="{{todo.id}}" 
+            checked="{{todo.checked}}" 
+        />
         <input 
-                value="{{todo.text}}" 
-                bindblur="toEdit" 
-                data-text="{{todo.text}}" 
-                data-id="{{todo.id}}"/>
+            value="{{todo.text}}" 
+            bindblur="toEdit" 
+            data-text="{{todo.text}}" 
+            data-id="{{todo.id}}"
+        />
         <icon 
             type="clear" 
             size="23" 
             catchtap="toRemove" 
-            id="{{todo.id}}"/>
+            id="{{todo.id}}"
+        />
       </label>
     </checkbox-group>  
   </view>
   <view class="foot">
     <button 
-          bindtap="clearRemove" 
-          class="bigclear">clear</button>
+      bindtap="clearRemove" 
+      class="bigclear">clear</button>
   </view>
 </view>

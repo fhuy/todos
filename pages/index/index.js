@@ -12,15 +12,9 @@ Page({
   },
   onLoad: function () {
     API.login().then(res=>{
-      console.log('look',res)
-      // if (res.statusCode === 200){
         this.setData({
           todos: res.data.list
-          // todos: res
         })
-      // } else {
-      //   console.log('获取数据失败', res.errMsg)
-      // }
     })
   },
   toAdd: function (res) {
@@ -37,7 +31,7 @@ Page({
       return
     }
     const value = res.detail.value    
-    API.addApi(value)
+    API.addTodo(value)
       .then(res => {
         if (res.statusCode === 200) {
           this.data.todos.push({
@@ -59,7 +53,7 @@ Page({
   },
   toRemove: function (e) {
     const id = parseInt(e.currentTarget.id)
-    API.delApi(id)
+    API.delTodo(id)
       .then(res => {
         if (res.statusCode === 200) {
           this.data.todos = this.data.todos.filter(item => item.id != id)
@@ -82,7 +76,7 @@ Page({
       new_value
     }
     if(last_value !== new_value){
-      API.modApi(editInfo)
+      API.modTodo(editInfo)
         .then(res =>{
           if(res.statusCode===200){
             this.data.todos.forEach(item => {
@@ -106,7 +100,7 @@ Page({
     this.setData({ all: this.data.all })
   },
   clearRemove: function () {
-    API.delMoreApi(this.data.tags)
+    API.delMoreTodos(this.data.tags)
       .then(res => {
           this.data.todos = this.data.todos.filter(item => {
             return this.data.tags.includes(item.id) === false

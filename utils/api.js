@@ -8,11 +8,13 @@ const login = () => {
     wx.login({
       success(res) {
           if (res.code) {
-            resolve(requestPP(
-              post,
-              log_url,
-              { code: res.code }
-            ))
+            resolve(
+              requestLogin(
+                post,
+                log_url,
+                { code: res.code }
+              )
+            )
           } else {
             reject(res)
           }
@@ -25,13 +27,13 @@ const login = () => {
         uid: res.data.uid,
         token: res.data.token
       }      
-      return getList()
+      return getLists()
     }
     return res.errMsg
   })
 }
 
-const getList = () => {
+const getLists = () => {
   const get_url = `${base_url}/getTodoList`  
   return requestP(
     post,
@@ -39,7 +41,7 @@ const getList = () => {
   )
 }
 
-const addApi = (todoText)=>{
+const addTodo = (todoText)=>{
   if (!wx.getStorageSync('userInfo')) {
     login()
   }  
@@ -54,7 +56,7 @@ const addApi = (todoText)=>{
   )
 }
 
-const delApi = (id) => {
+const delTodo = (id) => {
   if (!wx.getStorageSync('userInfo')) {
     login()
   }  
@@ -69,22 +71,22 @@ const delApi = (id) => {
   )
 }
 
-const delMoreApi = (arr) => {
+const delMoreTodos = (moreSelected) => {
   if (!wx.getStorageSync('userInfo')) {
     login()
   }  
-  const promises=arr.map(id => {
-    return delApi(id)
+  const promises=moreSelected.map(id => {
+    return delTodo(id)
   })
   return Promise.all(promises) 
 }
 
-const modApi = (params) => {
+const modTodo = (modTodo) => {
   const mod_url = `${base_url}/modTodo`
   const userInfo = { 
-      todoText: params.new_value, 
+      todoText: modTodo.new_value, 
       todoIsDone: true,
-      todoID: params.id
+      todoID: modTodo.id
     }
   return requestP(
     post,
@@ -93,67 +95,56 @@ const modApi = (params) => {
   )
 }
 
-const requestPP = (method, url, userInfo) => {
-  const userID = app.globalData.userID
-  console.log('id', userID)
+const requestLogin = (method, url, userInfo) => {
+  const userID = app.globalData.userID;
   return new Promise((resolve, reject) => {
-    wx.request({
-      method,
-      url,
-      data: userInfo,
-      headers: {
-        'Content-Type': 'application/json' // 默认值
-      },
-      success: res => resolve(res),
-      fail: res => reject(res)
+    wx.request(
+      {
+        method,
+        url,
+        data: userInfo,
+        headers: {
+          'Content-Type': 'application/json' // 默认值
+        },
+        success: res => resolve(res),
+        fail: res => reject(res)
     })
   })
 }
 
 
-function responseModel(res) {
-  if (res.statusCode === 200) {
-    return new Promise((resolve, reject)=>{
-      resolve(res)
-      })
-  }else if(res.statusCode===400){
-      console.log('错误请求')
-  }
-}
+// function responseModel(res) {
+//   if (res.statusCode === 200) {
+//     return new Promise((resolve, reject)=>{
+//       resolve(res)
+//       })
+//   }else if(res.statusCode===400){
+//       console.log('错误请求')
+//   }
+// }
 
-const getUserId=()=>{
-  let userID={
-    uid: '',
-    token: ''
-  }
-  if(!userID){
-    console.log('xx')
-  }else{
-    console.log(1)
-  }
-  // if (!app.globalData.userID)
-}
 
 const requestP = (method, url, userInfo={}) => {
-  getUserId()
   const uid = app.globalData.userID.uid,
-    token = app.globalData.userID.token
+        token = app.globalData.userID.token;
 
   return new Promise((resolve, reject) => {
     wx.request({
       method,
-      url,
-      // data: userInfo,    
-      data: Object.assign({
-        uid,
-        token
-      },userInfo),          
+      url,  
+      data: Object.assign(
+        {
+          uid,
+          token
+        },
+        userInfo
+      ),          
       headers: {
         'Content-Type': 'application/json' // 默认值
       },
-      // success: res => resolve(res),
+      success: res => resolve(res),
       // success: res => resolve(responseModel(res)),
-      success: res => { return responseModel(res)},
+      // success: res => { return responseModel(res)},
       fail: res => reject(res)
     })
   })
@@ -161,10 +152,10 @@ const requestP = (method, url, userInfo={}) => {
 
 module.exports={
   login,
-  getList,
-  addApi,
-  delApi,
-  delMoreApi,
-  modApi  
+  getLists,
+  addTodo,
+  delTodo,
+  delMoreTodos,
+  modTodo  
 }
 
