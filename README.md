@@ -5,9 +5,9 @@
 #代码不够规范之处，请谅解，正在朝这方面努力#
 
 1.
-  if (!wx.getStorageSync('userInfo')) {
-    login()
-  }  
+if (!wx.getStorageSync('userInfo')) {
+  login()
+}  
 <p>2.requestLogin，没有想好{ code: res.code }参数怎么和requestP融合，或许可以用一个判断</p>
 3.“统一处理错误的逻辑”，这里关于代码设计之处不太明白，或许之后会看到类似的处理然后明白怎么做
 
